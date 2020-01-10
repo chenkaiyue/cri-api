@@ -61,10 +61,6 @@ service RuntimeService {
 
     // CreateContainer creates a new container in specified PodSandbox
     rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
-
-    // ModContainer mod containers with request id and hash
-    rpc ModContainer(ModContainerRequest) returns (ModContainerResponse) {}
-
     // StartContainer starts the container.
     rpc StartContainer(StartContainerRequest) returns (StartContainerResponse) {}
     // StopContainer stops a running container with a grace period (i.e., timeout).
@@ -79,6 +75,8 @@ service RuntimeService {
     rpc RemoveContainer(RemoveContainerRequest) returns (RemoveContainerResponse) {}
     // ListContainers lists all containers by filters.
     rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {}
+    // ModContainer mod containers with request id and hash
+    rpc ModContainer(ModContainerRequest) returns (ModContainerResponse) {}
     // ContainerStatus returns status of the container. If the container is not
     // present, returns an error.
     rpc ContainerStatus(ContainerStatusRequest) returns (ContainerStatusResponse) {}
@@ -400,17 +398,10 @@ message PodSandboxStatusRequest {
     bool verbose = 2;
 }
 
-// PodIP represents an ip of a Pod
-message PodIP{
-    // an ip is a string representation of an IPv4 or an IPv6
-    string ip = 1;
-}
 // PodSandboxNetworkStatus is the status of the network for a PodSandbox.
 message PodSandboxNetworkStatus {
     // IP address of the PodSandbox.
     string ip = 1;
-    // list of additional ips (not inclusive of PodSandboxNetworkStatus.Ip) of the PodSandBoxNetworkStatus
-    repeated PodIP additional_ips  = 2;
 }
 
 // Namespace contains paths to the namespaces.
@@ -648,9 +639,6 @@ message WindowsContainerSecurityContext {
     // exist in the container image and be resolved there by the runtime;
     // otherwise, the runtime MUST return error.
     string run_as_username = 1;
-
-    // The contents of the GMSA credential spec to use to run this container.
-    string credential_spec = 2;
 }
 
 // WindowsContainerConfig contains platform-specific configuration for
@@ -783,18 +771,6 @@ message CreateContainerResponse {
     string container_id = 1;
 }
 
-message ModContainerRequest {
-    // ID of the PodSandbox in which the container should be created.
-    string container_id = 1;
-    // Config of the container.
-    string container_hash = 2;
-}
-
-message ModContainerResponse {
-    // ID of the created container.
-    bool OK = 1;
-}
-
 message StartContainerRequest {
     // ID of the container to start.
     string container_id = 1;
@@ -849,6 +825,18 @@ message ContainerFilter {
 
 message ListContainersRequest {
     ContainerFilter filter = 1;
+}
+
+message ModContainerRequest {
+    // ID of the PodSandbox in which the container should be created.
+    string container_id = 1;
+    // Config of the container.
+    string container_hash = 2;
+}
+
+message ModContainerResponse {
+    // ID of the created container.
+    bool OK = 1;
 }
 
 // Container provides the runtime information for a container, such as ID, hash,
